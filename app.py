@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-# Allow requests from any origin (you can restrict to your Lovable domain later)
+# Allow requests from any origin (can restrict to Lovable domain later)
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=False)
 
 # --- Load model & encoders once at startup ---
@@ -27,32 +27,40 @@ def predict():
     if not isinstance(symptoms, list):
         return jsonify({"error": "symptoms must be a list of strings"}), 400
 
-    # Normalize symptoms (lowercase/strip); optional simple aliasing
+    # --- Alias mapping: UI-friendly → dataset tokens ---
+    alias = {
+        "cough": ["cough"],
+        "sore throat": ["sore_throat"],
+        "stomach pain": ["stomach_pain"],
+        "diarrhea": ["diarrhea"],
+        "constipation": ["constipation"],
+        "joint pain": ["joint_pain"],
+        "skin rash or itching": ["skin_rash", "itching"],
+        "shortness of breath": ["shortness_of_breath"],
+        "chest pain": ["chest_pain"],
+        "fatigue": ["fatigue"],
+        "unexplained weight loss": ["weight_loss"],
+        "burning urination": ["burning_micturition"],
+        "loss of appetite": ["loss_of_appetite"],
+        "leg swelling": ["swollen_legs", "swelling_of_stomach"],
+        "vision problems": ["blurred_and_distorted_vision"],
+        "frequent urination": ["polyuria"],
+        "nausea and vomiting": ["nausea", "vomiting"],
+        "back pain": ["back_pain"]
+    }
+
+    # Normalize and map
     cleaned = []
     for s in symptoms:
         if not s:
             continue
         s_norm = s.strip().lower()
-        # quick common mappings from natural labels to dataset tokens
-        alias = {
-            "skin rash or itching": ["skin_rash", "itching"],
-            "sore throat": ["sore_throat"],
-            "shortness of breath": ["shortness_of_breath"],
-            "chest pain": ["chest_pain"],
-            "joint pain": ["joint_pain"],
-            "stomach pain": ["stomach_pain"],
-            "loss of appetite": ["loss_of_appetite"],
-            "frequent urination": ["polyuria", "frequent_urination"],  # keep both in case
-            "back pain": ["back_pain"],
-            "leg swelling": ["swelling_of_stomach","swollen_legs"],   # adapt if in your dataset
-        }
         if s_norm in alias:
             cleaned.extend(alias[s_norm])
         else:
-            # replace spaces with underscores for simple cases
             cleaned.append(s_norm.replace(" ", "_"))
 
-    # Keep only symptoms that the model knows
+    # Keep only known symptoms
     known = set(mlb.classes_.tolist())
     filtered = [s for s in cleaned if s in known]
 
@@ -61,7 +69,7 @@ def predict():
             "error": "no recognized symptoms",
             "received": symptoms,
             "normalized": cleaned,
-            "known_symptoms_example": list(sorted(list(known))[:20])  # small sample for debugging
+            "known_symptoms_example": list(sorted(list(known))[:20])
         }), 400
 
     X = mlb.transform([filtered])
