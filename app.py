@@ -1,86 +1,56 @@
 import os
 import joblib
+import numpy as np
 from flask import Flask, request, jsonify
-from flask_cors import CORS
 
 app = Flask(__name__)
-# Allow requests from any origin (can restrict to Lovable domain later)
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=False)
 
-# --- Load model & encoders once at startup ---
-clf = joblib.load('disease_model.pkl')
-mlb = joblib.load('symptom_encoder.pkl')
-le  = joblib.load('disease_encoder.pkl')
+# Load model and encoders
+model = joblib.load("disease_model.joblib")
+mlb = joblib.load("symptom_encoder.joblib")
+le = joblib.load("label_encoder.joblib")
 
-@app.route("/", methods=["GET"])
-def root():
-    return jsonify({"status": "ok", "service": "disease-detector"})
+@app.route("/")
+def home():
+    return "Disease Prediction API is running"
 
-@app.route("/predict", methods=["POST", "OPTIONS"])
+@app.route("/predict", methods=["POST"])
 def predict():
-    # Handle CORS preflight
-    if request.method == "OPTIONS":
-        return ("", 204)
+    data = request.get_json()
 
-    data = request.get_json(silent=True) or {}
-    symptoms = data.get("symptoms", [])
-    if not isinstance(symptoms, list):
-        return jsonify({"error": "symptoms must be a list of strings"}), 400
+    if not data or "symptoms" not in data:
+        return jsonify({"error": "Symptoms not provided"}), 400
 
-    # --- Alias mapping: UI-friendly → dataset tokens ---
-    alias = {
-        "cough": ["cough"],
-        "sore throat": ["sore_throat"],
-        "stomach pain": ["stomach_pain"],
-        "diarrhea": ["diarrhea"],
-        "constipation": ["constipation"],
-        "joint pain": ["joint_pain"],
-        "skin rash or itching": ["skin_rash", "itching"],
-        "shortness of breath": ["shortness_of_breath"],
-        "chest pain": ["chest_pain"],
-        "fatigue": ["fatigue"],
-        "unexplained weight loss": ["weight_loss"],
-        "burning urination": ["burning_micturition"],
-        "loss of appetite": ["loss_of_appetite"],
-        "leg swelling": ["swollen_legs", "swelling_of_stomach"],
-        "vision problems": ["blurred_and_distorted_vision"],
-        "frequent urination": ["polyuria"],
-        "nausea and vomiting": ["nausea", "vomiting"],
-        "back pain": ["back_pain"]
-    }
-
-    # Normalize and map
-    cleaned = []
-    for s in symptoms:
-        if not s:
-            continue
-        s_norm = s.strip().lower()
-        if s_norm in alias:
-            cleaned.extend(alias[s_norm])
-        else:
-            cleaned.append(s_norm.replace(" ", "_"))
+    # Normalize input
+    symptoms = [str(s).strip().lower() for s in data["symptoms"] if str(s).strip()]
 
     # Keep only known symptoms
-    known = set(mlb.classes_.tolist())
-    filtered = [s for s in cleaned if s in known]
+    known_symptoms = set(mlb.classes_)
+    valid_symptoms = [s for s in symptoms if s in known_symptoms]
 
-    if not filtered:
+    if len(valid_symptoms) == 0:
         return jsonify({
-            "error": "no recognized symptoms",
-            "received": symptoms,
-            "normalized": cleaned,
-            "known_symptoms_example": list(sorted(list(known))[:20])
+            "error": "No valid symptoms provided",
+            "received": symptoms
         }), 400
 
-    X = mlb.transform([filtered])
-    y_pred = clf.predict(X)
-    disease = le.inverse_transform(y_pred)[0]
+    # Encode & predict
+    X = mlb.transform([valid_symptoms])
+    probabilities = model.predict_proba(X)[0]
+
+    top_indices = np.argsort(probabilities)[::-1][:5]
+
+    results = []
+    for i in top_indices:
+        results.append({
+            "disease": le.inverse_transform([i])[0],
+            "probability": float(probabilities[i])
+        })
 
     return jsonify({
-        "predicted_disease": disease,
-        "recognized_symptoms": filtered
+        "selected_symptoms": valid_symptoms,
+        "predictions": results
     })
 
 if __name__ == "__main__":
-    # Render sets PORT; default to 10000 if not present
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 10000)), debug=False)
+    app.run(host="0.0.0.0", port=5000)
