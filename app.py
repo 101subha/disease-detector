@@ -29,23 +29,24 @@ def predict():
         # ✅ Convert symptoms → numerical format
         input_vector = symptom_encoder.transform([symptoms])
 
-        # ✅ Predict disease
-        prediction = model.predict(input_vector)
-        probabilities = model.predict_proba(input_vector)
+        # ✅ Get probabilities
+        probabilities = model.predict_proba(input_vector)[0]
 
-        # ✅ Decode label
-        disease = label_encoder.inverse_transform(prediction)[0]
+        # ✅ Get top 3 predictions
+        top_indices = np.argsort(probabilities)[-3:][::-1]
 
-        # ✅ Get probability
-        prob = float(np.max(probabilities))
+        results = []
+        for i in top_indices:
+            disease = label_encoder.inverse_transform([i])[0]
+            prob = float(probabilities[i])
+
+            results.append({
+                "disease": disease,
+                "probability": prob
+            })
 
         return jsonify({
-            "predictions": [
-                {
-                    "disease": disease,
-                    "probability": prob
-                }
-            ]
+            "predictions": results
         })
 
     except Exception as e:
