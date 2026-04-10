@@ -14,155 +14,185 @@ symptom_encoder = joblib.load("symptom_encoder.joblib")
 # ✅ Disease Info (Top 15 Common)
 disease_info = {
 
-    "Fungal infection": {
-        "description": "A fungal infection affects the skin, hair, or nails caused by fungi.",
-        "precautions": [
-            "Keep affected area clean and dry",
-            "Use antifungal creams",
-            "Avoid sharing personal items",
-            "Wear breathable clothing"
-        ]
-    },
+"Fungal infection": {
+    "description": "A condition affecting skin, hair, or nails caused by fungi.",
+    "precautions": [
+        "Keep affected area clean and dry",
+        "Use antifungal medication",
+        "Avoid sharing personal items",
+        "Wear breathable clothing"
+    ]
+},
 
-    "Common Cold": {
-        "description": "A viral infection of the upper respiratory tract.",
-        "precautions": [
-            "Drink warm fluids",
-            "Take proper rest",
-            "Wash hands frequently",
-            "Avoid cold exposure"
-        ]
-    },
+"Allergy": {
+    "description": "An immune reaction to allergens like dust, pollen, or food.",
+    "precautions": [
+        "Avoid known allergens",
+        "Keep surroundings clean",
+        "Use antihistamines if needed",
+        "Wear mask in dusty areas"
+    ]
+},
 
-    "Migraine": {
-        "description": "A neurological condition causing intense headaches.",
-        "precautions": [
-            "Avoid bright light and noise",
-            "Maintain sleep schedule",
-            "Stay hydrated",
-            "Reduce stress"
-        ]
-    },
+"GERD": {
+    "description": "A condition where stomach acid flows back into the food pipe.",
+    "precautions": [
+        "Avoid spicy and oily food",
+        "Eat smaller meals",
+        "Do not lie down after eating",
+        "Maintain healthy weight"
+    ]
+},
 
-    "Malaria": {
-        "description": "A mosquito-borne disease causing fever and chills.",
-        "precautions": [
-            "Use mosquito nets",
-            "Apply insect repellent",
-            "Avoid stagnant water",
-            "Wear full sleeves"
-        ]
-    },
+"Chronic cholestasis": {
+    "description": "A liver condition where bile flow is reduced or blocked.",
+    "precautions": [
+        "Avoid alcohol consumption",
+        "Follow low-fat diet",
+        "Consult doctor regularly",
+        "Maintain proper hygiene"
+    ]
+},
 
-    "Dengue": {
-        "description": "A viral infection transmitted by mosquitoes.",
-        "precautions": [
-            "Avoid mosquito bites",
-            "Stay hydrated",
-            "Use mosquito repellents",
-            "Keep surroundings clean"
-        ]
-    },
+"Drug Reaction": {
+    "description": "An unwanted reaction caused by certain medications.",
+    "precautions": [
+        "Stop the triggering drug",
+        "Consult a doctor immediately",
+        "Avoid self-medication",
+        "Monitor symptoms carefully"
+    ]
+},
 
-    "Typhoid": {
-        "description": "A bacterial infection spread through contaminated food and water.",
-        "precautions": [
-            "Drink clean water",
-            "Maintain hygiene",
-            "Avoid street food",
-            "Wash hands regularly"
-        ]
-    },
+"Peptic ulcer diseae": {
+    "description": "Sores that develop in the lining of the stomach or intestine.",
+    "precautions": [
+        "Avoid spicy food",
+        "Reduce stress",
+        "Avoid alcohol and smoking",
+        "Take prescribed medicines"
+    ]
+},
 
-    "Diabetes": {
-        "description": "A chronic condition affecting blood sugar levels.",
-        "precautions": [
-            "Maintain healthy diet",
-            "Exercise regularly",
-            "Monitor blood sugar",
-            "Avoid sugary foods"
-        ]
-    },
+"AIDS": {
+    "description": "A condition caused by HIV that weakens the immune system.",
+    "precautions": [
+        "Practice safe sex",
+        "Avoid sharing needles",
+        "Get regular medical checkups",
+        "Follow prescribed treatment"
+    ]
+},
 
-    "Hypertension": {
-        "description": "A condition of high blood pressure.",
-        "precautions": [
-            "Reduce salt intake",
-            "Exercise regularly",
-            "Avoid stress",
-            "Maintain healthy weight"
-        ]
-    },
+"Gastroenteritis": {
+    "description": "Inflammation of stomach and intestines causing diarrhea.",
+    "precautions": [
+        "Drink clean and safe water",
+        "Maintain proper hygiene",
+        "Avoid contaminated food",
+        "Stay hydrated"
+    ]
+},
 
-    "Asthma": {
-        "description": "A respiratory condition causing breathing difficulty.",
-        "precautions": [
-            "Avoid allergens",
-            "Use inhaler as prescribed",
-            "Stay in clean environment",
-            "Avoid smoke"
-        ]
-    },
+"Bronchial Asthma": {
+    "description": "A respiratory condition causing difficulty in breathing.",
+    "precautions": [
+        "Avoid dust and allergens",
+        "Use inhaler as prescribed",
+        "Avoid smoking",
+        "Keep environment clean"
+    ]
+},
 
-    "Pneumonia": {
-        "description": "An infection that inflames air sacs in the lungs.",
-        "precautions": [
-            "Take proper rest",
-            "Stay hydrated",
-            "Avoid smoking",
-            "Consult doctor early"
-        ]
-    },
+"Migraine": {
+    "description": "A neurological condition causing severe headaches.",
+    "precautions": [
+        "Avoid stress and bright lights",
+        "Maintain proper sleep",
+        "Stay hydrated",
+        "Identify and avoid triggers"
+    ]
+},
 
-    "Allergy": {
-        "description": "A reaction of the immune system to substances.",
-        "precautions": [
-            "Avoid allergens",
-            "Take antihistamines",
-            "Keep surroundings clean",
-            "Use masks if needed"
-        ]
-    },
+"Cervical spondylosis": {
+    "description": "A condition affecting neck bones due to aging or strain.",
+    "precautions": [
+        "Maintain good posture",
+        "Avoid heavy lifting",
+        "Exercise regularly",
+        "Use proper neck support"
+    ]
+},
 
-    "Food Poisoning": {
-        "description": "Illness caused by contaminated food.",
-        "precautions": [
-            "Eat fresh food",
-            "Maintain hygiene",
-            "Drink safe water",
-            "Avoid stale food"
-        ]
-    },
+"Jaundice": {
+    "description": "A condition causing yellowing of skin and eyes.",
+    "precautions": [
+        "Drink clean water",
+        "Eat healthy food",
+        "Avoid alcohol",
+        "Take proper rest"
+    ]
+},
 
-    "Acne": {
-        "description": "A skin condition causing pimples and spots.",
-        "precautions": [
-            "Keep face clean",
-            "Avoid oily products",
-            "Drink water",
-            "Avoid touching face"
-        ]
-    },
+"Malaria": {
+    "description": "A mosquito-borne disease causing fever and chills.",
+    "precautions": [
+        "Use mosquito nets",
+        "Apply repellents",
+        "Avoid stagnant water",
+        "Wear full-sleeve clothes"
+    ]
+},
 
-    "Arthritis": {
-        "description": "Inflammation of joints causing pain and stiffness.",
-        "precautions": [
-            "Exercise regularly",
-            "Maintain weight",
-            "Apply hot/cold therapy",
-            "Consult doctor"
-        ]
-    },
+"Dengue": {
+    "description": "A viral infection spread by mosquitoes causing high fever.",
+    "precautions": [
+        "Avoid mosquito bites",
+        "Stay hydrated",
+        "Use mosquito repellents",
+        "Keep surroundings clean"
+    ]
+},
 
-    "Jaundice": {
-        "description": "A condition causing yellowing of skin and eyes.",
-        "precautions": [
-            "Drink clean water",
-            "Eat healthy food",
-            "Avoid alcohol",
-            "Take proper rest"
-        ]
-    }
+"Typhoid": {
+    "description": "A bacterial infection spread through contaminated food and water.",
+    "precautions": [
+        "Drink clean water",
+        "Avoid street food",
+        "Maintain hygiene",
+        "Wash hands regularly"
+    ]
+},
+
+"Pneumonia": {
+    "description": "A lung infection causing breathing difficulty.",
+    "precautions": [
+        "Take proper rest",
+        "Stay hydrated",
+        "Avoid smoking",
+        "Seek medical attention early"
+    ]
+},
+
+"Common Cold": {
+    "description": "A viral infection affecting nose and throat.",
+    "precautions": [
+        "Drink warm fluids",
+        "Take proper rest",
+        "Maintain hygiene",
+        "Avoid cold exposure"
+    ]
+},
+
+"Tuberculosis": {
+    "description": "A bacterial infection affecting the lungs.",
+    "precautions": [
+        "Cover mouth while coughing",
+        "Complete full treatment",
+        "Avoid crowded places",
+        "Maintain proper hygiene"
+    ]
+}
 }
 
 
