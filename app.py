@@ -195,6 +195,29 @@ disease_info = {
 }
 }
 
+# ✅ Doctor Mapping
+doctor_map = {
+    "Fungal infection": "Dermatologist",
+    "Allergy": "Allergist / General Physician",
+    "GERD": "Gastroenterologist",
+    "Chronic cholestasis": "Hepatologist",
+    "Drug Reaction": "General Physician",
+    "Peptic ulcer diseae": "Gastroenterologist",
+    "AIDS": "Infectious Disease Specialist",
+    "Gastroenteritis": "General Physician",
+    "Bronchial Asthma": "Pulmonologist",
+    "Migraine": "Neurologist",
+    "Cervical spondylosis": "Orthopedic",
+    "Jaundice": "Hepatologist",
+    "Malaria": "General Physician",
+    "Dengue": "General Physician",
+    "Typhoid": "General Physician",
+    "Pneumonia": "Pulmonologist",
+    "Common Cold": "General Physician",
+    "Tuberculosis": "Pulmonologist"
+}
+
+
 
 @app.route('/')
 def home():
@@ -224,16 +247,25 @@ def predict():
             disease = label_encoder.inverse_transform([i])[0]
             prob = float(probabilities[i])
 
+            # ✅ Clean fallback
             info = disease_info.get(disease, {
-                "description": "Information not available. Please consult a doctor.",
-                "precautions": ["Consult a healthcare professional."]
+                "description": f"{disease} may require proper medical diagnosis.",
+                "precautions": [
+                    "Monitor symptoms",
+                    "Maintain hygiene",
+                    "Stay hydrated",
+                    "Consult a doctor"
+                ]
             })
+
+            doctor = doctor_map.get(disease, "General Physician")
 
             results.append({
                 "disease": disease,
                 "probability": prob,
                 "description": info["description"],
-                "precautions": info["precautions"]
+                "precautions": info["precautions"],
+                "doctor": doctor
             })
 
         return jsonify({"predictions": results})
